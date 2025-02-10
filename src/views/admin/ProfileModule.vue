@@ -52,6 +52,7 @@
       </v-container>
     </article>
 
+    <!-- Modal de Cambio de Contraseña -->
     <DialogAdminComponent
       v-model="showPasswordDialog"
       title="Cambiar Contraseña"
@@ -61,28 +62,28 @@
       @cancel="onCancel"
     >
       <v-form>
-        <inputComponent
-          v-model="oldPassword"
-          :type="type"
-          :label="oldPasswordLabel"
-          :rules="passwordRules"
-          :density="density"
-        />
-        <inputComponent
-          v-model="newPassword"
-          :type="type"
-          :label="newPasswordLabel"
-          :rules="passwordRules"
-          :density="density"
-        />
-        <inputComponent
-          v-model="confirmNewPassword"
-          :type="type"
-          :label="confirmNewPasswordLabel"
-          :rules="passwordRules"
-          :density="density"
-        />
+        <inputComponent v-model="oldPassword" :type="type" :label="oldPasswordLabel" :rules="passwordRules" :density="density" />
+        <inputComponent v-model="newPassword" :type="type" :label="newPasswordLabel" :rules="passwordRules" :density="density" />
+        <inputComponent v-model="confirmNewPassword" :type="type" :label="confirmNewPasswordLabel" :rules="passwordRules" :density="density" />
       </v-form>
+    </DialogAdminComponent>
+
+    <!-- Modal de Notificación -->
+    <DialogAdminComponent
+      v-model="showInfoDialog"
+      :title="modalTitle"
+      cancelText="Cerrar"
+      acceptText="Aceptar"
+      @accept="notfAcept"
+      @cancel="notfCancel"
+    >
+      <v-container>
+        <v-row class="text-justify">
+          <v-col>
+            <p>{{ modalMessage }}</p>
+          </v-col>
+        </v-row>
+      </v-container>
     </DialogAdminComponent>
   </v-container>
 </template>
@@ -90,6 +91,8 @@
 <script>
 import DialogAdminComponent from '@/components/admin/partial/DialogAdminComponent.vue'
 import inputComponent from '@/components/public/components/InputDefaultComponent.vue'
+import { isTokenValid } from '@/plugins/TokenJWT.js'
+import { ResetPasswordService } from '@/views/admin/services/UserAccount/ResetPassword';
 
 export default {
   name: 'SettingsModule',
@@ -118,26 +121,47 @@ export default {
       newPasswordLabel: "Nueva contraseña",
       confirmNewPasswordLabel: "Confirmar nueva contraseña",
       passwordRules: [
-                (v) => !!v || "Contraseña es Obligatoria",
-                (v) => v.length >= 4 || "La contraseña debe contener mínimo 4 carácteres",
-            ],
+        (v) => !!v || "Contraseña es Obligatoria",
+        (v) => v.length >= 4 || "La contraseña debe contener mínimo 4 carácteres",
+      ],
       density: 'comfortable',
       type: 'password',
+      modalTitle: 'Notificación',
+      modalMessage: '',
+      showInfoDialog: false,
     };
   },
   methods: {
     showChangePasswordDialog() {
       this.showPasswordDialog = true;
     },
-    onAccept() {
-      console.log("ACEPTASTE")
-
-
-      this.showPasswordDialog = false;
+    async onAccept() {
+      if (!isTokenValid()) {
+        // Token ha expirado, manejar redirección si es necesario
+        // this.$router.push('/login');
+      } else {
+        this.showPasswordDialog = false;
+        try {
+          const resetPassword = await ResetPasswordService(this.oldPassword, this.newPassword);
+          if (!resetPassword.error && resetPassword.status === "OK") {
+            this.modalMessage = 'La contraseña ha sido actualizada correctamente.';
+            this.showInfoDialog = true;
+          }
+        } catch (error) {
+          console.error('Error al actualizar la contraseña:', error);
+          this.modalMessage = 'No se pudo actualizar la contraseña. Por favor, intenta nuevamente.';
+          this.showInfoDialog = true;
+        }
+      }
     },
     onCancel() {
       this.showPasswordDialog = false;
-      console.log('Acción cancelada');
+    },
+    notfAcept() {
+      this.showInfoDialog = false;
+    },
+    notfCancel() {
+      this.showInfoDialog = false;
     },
   },
 };
@@ -172,5 +196,8 @@ export default {
 
 .text-right {
   text-align: right;
+}
+.text-justify {
+  text-align: justify;
 }
 </style>

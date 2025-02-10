@@ -1,15 +1,18 @@
 import axios from 'axios';
+const uri =  `${process.env.VUE_APP_ORIGIN}/api/`;
 
-export const ResetPassword = async (oldPassword, newPassword) => {
+export const ResetPasswordService = async (oldPassword, newPassword) => {
     try {
+
         const token = localStorage.getItem('sessionToken');
         if (!token) {
             return;
         }
-
-        const response = await axios.post('http://localhost:4000/api/auth/logout', {
+        
+        const response = await axios.post(uri + 'recover-password/resetPassword', {
             oldPassword,
-            newPassword 
+            newPassword,
+            token,
         }, {
             headers: {
                 Authorization: `Bearer ${token}`

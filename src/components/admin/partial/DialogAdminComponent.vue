@@ -68,4 +68,7 @@ export default {
 
 <style scoped>
 /* Estilos específicos si es necesario */
+.text-primary{
+  color: #096fba !important;
+}
 </style>

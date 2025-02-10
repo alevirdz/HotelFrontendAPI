@@ -13,6 +13,7 @@
     "core-js": "^3.8.3",
     "dotenv": "^16.4.5",
     "firebase": "^9.22.0",
+    "jwt-decode": "^4.0.0",
     "pinia": "^2.2.6",
     "roboto-fontface": "*",
     "sweetalert2": "^11.14.5",
