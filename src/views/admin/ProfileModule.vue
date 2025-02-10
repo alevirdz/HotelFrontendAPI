@@ -13,7 +13,8 @@
           </v-col>
 
           <v-col class="app-name-user text-center" cols="12" sm="12">
-            <h2 class="text-2xl md:text-3xl font-bold">Vasili Savitski</h2>
+            <!-- Mostrar el nombre solo si payloadUser.name está disponible -->
+            <h2 class="text-2xl md:text-3xl font-bold" v-if="payloadUser.name">{{ payloadUser.name }} {{ payloadUser.lastName }}</h2>
             <div class="flex justify-center space-x-1 text-sm">
               <p>Member since</p>
               <p>8/12/2020</p>
@@ -30,7 +31,7 @@
                 <p>Email</p>
               </v-col>
               <v-col cols="10">
-                <span class="current-email">example@plataforma.com</span>
+                <span class="current-email">{{ payloadUser.email || 'Correo no disponible' }}</span>
               </v-col>
             </v-row>
           </v-col>
@@ -91,7 +92,7 @@
 <script>
 import DialogAdminComponent from '@/components/admin/partial/DialogAdminComponent.vue'
 import inputComponent from '@/components/public/components/InputDefaultComponent.vue'
-import { isTokenValid } from '@/plugins/TokenJWT.js'
+import { isTokenValid, getTokenPayload } from '@/plugins/TokenJWT.js'
 import { ResetPasswordService } from '@/views/admin/services/UserAccount/ResetPassword';
 
 export default {
@@ -129,16 +130,30 @@ export default {
       modalTitle: 'Notificación',
       modalMessage: '',
       showInfoDialog: false,
+      payloadUser: {}
     };
   },
   methods: {
+    loadUserData() {
+      const payload = getTokenPayload();
+      if (payload) {
+        this.payloadUser = {
+          name: payload.name || 'Nombre no disponible',
+          lastName: payload.lastName || 'Apellido no disponible',
+          email: payload.email || 'Correo no disponible',
+          // rol: payload.rol
+        };
+      } else {
+        this.$router.push('/login'); // Redirige a login si no existe payload
+      }
+    },
     showChangePasswordDialog() {
       this.showPasswordDialog = true;
     },
     async onAccept() {
       if (!isTokenValid()) {
-        // Token ha expirado, manejar redirección si es necesario
-        // this.$router.push('/login');
+        // Token ha expirado
+        this.$router.push('/login');
       } else {
         this.showPasswordDialog = false;
         try {
@@ -163,6 +178,9 @@ export default {
     notfCancel() {
       this.showInfoDialog = false;
     },
+  },
+  async mounted() {
+    this.loadUserData();
   },
 };
 </script>
@@ -197,6 +215,7 @@ export default {
 .text-right {
   text-align: right;
 }
+
 .text-justify {
   text-align: justify;
 }

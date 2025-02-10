@@ -19,3 +19,17 @@ export function isTokenValid() {
     return false;
   }
 }
+
+export function getTokenPayload() {
+  const token = localStorage.getItem('sessionToken');
+  if (!token) {
+    return null;
+  }
+
+  try {
+    const decoded = jwtDecode(token);
+    return decoded;
+  } catch (error) {
+    return null;
+  }
+}
