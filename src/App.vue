@@ -1,27 +1,29 @@
 <template>
   <v-app>
-    <!-- <Header v-if="isAuthenticated && isModeOnlyApp" />
-    <Header v-if="!isModeOnlyApp && !isAuthenticated" />
+    <!-- Mostrar el Navbar solo si el usuario no está autenticado -->
+    <Navbar 
+      v-if="!isAuthenticated" 
+      :company="'MiApp'" 
+      :menu="menuList" 
+      :color="'blue'" 
+      :modeDark="true"
+    />
 
     <main class="content">
+      <!-- La vista cambia dependiendo de la ruta -->
       <router-view />
     </main>
-    <Footer v-if="!isModeOnlyApp && !isAuthenticated" />
-    <Footer v-if="isModeOnlyApp && isAuthenticated" />
-    <ButtonArrowTop v-if="!isAuthenticated && !isModeOnlyApp" /> -->
-    
-    <!-- <Header></Header> -->
-    <Navbar  :company="'MiApp'" :menu="menuList" :color="'blue'" :modeDark="true" ></Navbar>
-    <main class="content">
-      <router-view />
-    </main>
-    <Footer></Footer>
-    <ButtonArrowTop></ButtonArrowTop>
+
+    <!-- Mostrar el Footer solo si el usuario no está autenticado -->
+    <Footer v-if="!isAuthenticated" />
+
+    <!-- Mostrar el botón de flecha hacia arriba solo si no está autenticado -->
+    <ButtonArrowTop v-if="!isAuthenticated" />
   </v-app>
 </template>
 
 <script>
-// import Header from './layout/Header.vue';
+// Importa los componentes necesarios
 import Navbar from '../src/components/Navbar.vue';
 import Footer from './layout/Footer.vue';
 import ButtonArrowTop from './components/Whatsapp.vue';
@@ -29,32 +31,35 @@ import ButtonArrowTop from './components/Whatsapp.vue';
 export default {
   name: 'App',
   components: {
-    // Header,
     Navbar,
     Footer,
     ButtonArrowTop
   },
   data() {
     return {
-      isModeOnlyApp: process.env.VUE_APP_MODE === 'web',  
+      // Estado de autenticación del usuario
       isAuthenticated: false,
+      // Logo de la app
       logo: { show: true, url: 'logo.png' },
+      // Lista de menús para el navbar
       menuList: [
         { title: 'Inicio', url: '/' },
         { title: 'Historia', url: '/history' },
         { title: 'About', url: '/about' },
-        { title: 'Iniciar sesión', url: '/login' },
-      ],
+        { title: 'Iniciar sesión', url: '/login' }
+      ]
     };
   },
   created() {
+    // Verifica si el usuario está autenticado al cargar la app
     this.isAuthenticated = !!localStorage.getItem('sessionToken');
   },
   watch: {
+    // Revisa cambios de ruta y actualiza el estado de autenticación
     '$route'() {
       this.isAuthenticated = !!localStorage.getItem('sessionToken');
     }
-  },
+  }
 };
 </script>
 
@@ -64,6 +69,7 @@ export default {
   flex-direction: column;
   min-height: 100vh;
 }
+
 .content {
   flex: 1;
 }
