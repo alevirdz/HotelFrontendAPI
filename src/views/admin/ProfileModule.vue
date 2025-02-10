@@ -28,23 +28,22 @@
           <v-col cols="12">
             <v-row align="center" justify="center">
               <v-col cols="2">
-                <p>Email</p>
+                <p>Email:</p>
               </v-col>
               <v-col cols="10">
                 <span class="current-email">{{ payloadUser.email || 'Correo no disponible' }}</span>
               </v-col>
             </v-row>
           </v-col>
-
           <v-col class="account-detail" cols="12">
             <v-row align="center" justify="center">
-              <v-col cols="2">
-                <p>Contraseña</p>
+              <v-col cols="6" sm="2" md="2">
+                <p>Contraseña: </p>
               </v-col>
-              <v-col cols="7">
+              <v-col cols="6" sm="4" md="7">
                 <input class="current-password" type="password" value="•••••••••••••" readonly />
               </v-col>
-              <v-col cols="3" class="text-left">
+              <v-col cols="12" sm="2" md="3" class="text-left">
                 <v-btn density="default" @click="showChangePasswordDialog">Cambiar contraseña</v-btn>
               </v-col>
             </v-row>
